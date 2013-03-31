@@ -1,0 +1,3 @@
+#!/bin/sh
+# paste something to sprunge
+curl -F 'sprunge=<-' http://sprunge.us

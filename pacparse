@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+# prettify output from archlinux's pacman.
+use strict;
+use warnings;
+
+my $red 	= "\e[0;31m";
+my $green 	= "\e[0;32m";
+my $yellow 	= "\e[0;33m";
+my $blue 	= "\e[0;34m";
+my $purple 	= "\e[0;35m";
+my $grey	= "\e[1;30m";
+my $reset 	= "\e[0;0m";
+
+my %repos = ( "core" 	=> $red,
+	   "community"	=> $purple,
+	   "extra"	=> $blue,
+	   "multilib"	=> $green
+);
+
+my @stats = ( 	"downloading",
+		"checking",
+		"loading",
+		"upgrading",
+		"installing"
+);
+
+my $isin  = 0;
+while ( my $line = <> ){
+	my $found = 0;
+
+	my $replace = $blue . "::" . $reset;
+	$line =~ s/::/$replace/;
+
+	foreach( keys( %repos )){
+		if ( $line =~ /^$_/ ){
+			my @meh = split( "/", $line );
+			my @blarg = split( " ", $meh[1] );
+			printf( "%25s %s %s", "[$repos{$_}$_$reset]", $blarg[0], "$grey$blarg[1]$reset" );
+			print( " [", $green, "installed", $reset, "]" ) if ( $line =~ /installed/ );
+			print( "\n" );
+
+			$line = <>;
+			print( " "x9, $line );
+			$found = 1;
+		}
+	}
+
+	if ( !$found ){
+		foreach( @stats ){
+			if ( $line =~ /^$_/ ){
+				print(" |- ");
+				print( $line );
+				$found = 1;
+			}
+		}
+	}
+
+	if ( !$found ){
+		$line =~ s/^ /   /;
+		print( $line );
+	}
+}
