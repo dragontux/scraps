@@ -1,3 +1,4 @@
+; i/o routines for x86-64 linux to make writing asm easier
 global _start
 
 global putc 	; int putc( int char, int fd );
@@ -78,7 +79,7 @@ putchar:
 	ret
 
 getchar:
-	push rsi
+	push rdi
 
 	mov rdi, STDIN
 	call getc
